@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import xyz.szczerba.portfolioapi.project.dto.ProjectReadModel;
-import xyz.szczerba.portfolioapi.project.dto.ProjectWriteModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,26 +22,25 @@ class ProjectService{
         this.tagQueryRepository = tagQueryRepository;
     }
 
-    public List<ProjectReadModel> getAll(int page, Sort.Direction sort, String sortBy, int items) {
+    public List<Project> getAll(int page, Sort.Direction sort, String sortBy, int items) {
         List<Project> list = projectQueryRepository.findAll(
                 PageRequest.of(page, items,
                         Sort.by(sort, sortBy)
                 )).getContent();
 
-        return ProjectFactory.toDto(list);
+        return list;
     }
 
-    public ProjectReadModel getSingle(long id){
-        return ProjectFactory.toDto(projectQueryRepository.findById(id).get());
+    public Project getSingle(long id){
+        return projectQueryRepository.findById(id).get();
     }
 
-    public ProjectReadModel save(ProjectWriteModel source){
-        Project toSave = ProjectFactory.toEntity(source);
+    public Project save(Project source){
 
-        toSave.setTags(saveTags(toSave.getTags()));
+        source.setTags(saveTags(source.getTags()));
 
-        Project result = projectQueryRepository.save(toSave);
-        return ProjectFactory.toDto(result);
+        Project result = projectQueryRepository.save(source);
+        return result;
     }
     public Set<Tag> saveTags(Set<Tag> tags){
         Set<Tag> tagSet = tags.stream().map(x -> {
@@ -60,13 +57,12 @@ class ProjectService{
     }
 
     @DeclutterTags
-    public ProjectReadModel modify(long id, ProjectWriteModel source){
-        Project result = ProjectFactory.toEntity(source);
-        result.setId(id);
+    public Project modify(long id, Project source){
+        source.setId(id);
 
-        result.setTags(saveTags(result.getTags()));
+        source.setTags(saveTags(source.getTags()));
 
-        return ProjectFactory.toDto(projectQueryRepository.save(result));
+        return projectQueryRepository.save(source);
     }
 
     @DeclutterTags
