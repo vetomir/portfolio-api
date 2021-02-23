@@ -49,7 +49,7 @@ class ProjectController {
         return ResponseEntity.created(URI.create("/" + result.getId())).body(ProjectFactory.toDto(result));
     }
 
-    @PostMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ProjectReadModel> update(
             @PathVariable(name = "id") long projectId,
             @RequestBody @Valid ProjectWriteModel project,
