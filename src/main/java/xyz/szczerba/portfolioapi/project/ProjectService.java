@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 @Service
 class ProjectService{
-    private final Logger logger = LoggerFactory.getLogger(ProjectService.class);
     private final ProjectQueryRepository projectQueryRepository;
     private final TagQueryRepository tagQueryRepository;
 

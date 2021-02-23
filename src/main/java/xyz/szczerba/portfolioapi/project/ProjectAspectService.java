@@ -19,7 +19,7 @@ class ProjectAspectService {
         this.tagQueryRepository = tagQueryRepository;
     }
 
-    @Pointcut("@annotation(pl.gregorymartin.post.DeclutterTags)")
+    @Pointcut("@annotation(xyz.szczerba.portfolioapi.project.DeclutterTags)")
     void InspectTags(){}
 
     @After("InspectTags()")
