@@ -2,6 +2,7 @@ package xyz.szczerba.portfolioapi.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Set;
 
@@ -34,20 +37,10 @@ class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/*.pdf")
-                /*.permitAll()
-                .antMatchers("/test")
-                .permitAll()
-                .antMatchers("/homepage.css")
-                .permitAll()
-                .antMatchers("/swagger")
-                .permitAll()*/
-                .permitAll()
-                .anyRequest()
-                .permitAll()
-                //.authenticated()
+                .antMatchers(HttpMethod.GET,"/api/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new AuthenticationFilter(userDetailsService(), tokenService), AnonymousAuthenticationFilter.class)
                 .sessionManagement()
@@ -80,5 +73,21 @@ class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                        .allowedOrigins(
+                                "http://localhost:3002",
+                                "https://my-blog-app-view.vercel.app")
+                        .allowedMethods("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH")
+                        .allowCredentials(true);
+            }
+        };
     }
 }
